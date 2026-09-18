@@ -1,0 +1,11 @@
+{
+  "workload": "w4",
+  "db": "uniref90",
+  "num_blocks": 4096,
+  "num_shards": 16,
+  "block_bytes": 134217728,
+  "num_queries": 64,
+  "arrival": {"type": "exponential", "mean_ns": 50000000},
+  "scan": {"block_interval_ns": 1000000, "jitter_cv": 0.0},
+  "shard_policy": "disjoint_groups"
+}

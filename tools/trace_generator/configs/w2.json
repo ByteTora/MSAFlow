@@ -1,0 +1,12 @@
+{
+  "workload": "w2",
+  "db": "uniref90",
+  "num_blocks": 4096,
+  "num_shards": 16,
+  "block_bytes": 134217728,
+  "num_queries": 64,
+  "arrival": {"type": "exponential", "mean_ns": 10000000},
+  "scan": {"block_interval_ns": 1000000, "jitter_cv": 0.2},
+  "shard_policy": "prefix_then_split",
+  "shard_policy_params": {"prefix_shards": 8, "groups": 4}
+}
