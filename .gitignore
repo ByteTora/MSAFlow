@@ -1,0 +1,20 @@
+# Build
+build/
+cmake-build-*/
+
+# Third-party checkouts (only the pin file is tracked)
+third_party/*
+!third_party/REFERENCES.md
+
+# Data / large generated artifacts
+data/
+workloads/*.jsonl
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store
