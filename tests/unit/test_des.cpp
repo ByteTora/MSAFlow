@@ -84,6 +84,16 @@ TEST(Des, PrefetchIsIssuedAndConsumed) {
   EXPECT_EQ(metrics.physical_block_reads, 2u);
 }
 
+TEST(Des, NoCoalesceBaselineRepeatsPhysicalReads) {
+  SimOptions options = base_options();
+  options.coalesce_inflight = false;
+  const SimMetrics metrics = run_simulation(tight_trace(3), options);
+  EXPECT_EQ(metrics.logical_block_requests, 6u);
+  EXPECT_EQ(metrics.physical_block_reads, 6u);
+  EXPECT_EQ(metrics.coalesced_requests, 0u);
+  EXPECT_NEAR(coalescing_ratio(metrics), 0.0, 1e-9);
+}
+
 TEST(Des, DrainsPendingBacklogForDisjointBlocks) {
   SimOptions options = base_options();
   options.io_depth = 4;

@@ -18,6 +18,7 @@ struct SimOptions {
   uint64_t base_latency_ns = 0;
   uint64_t io_depth = 1;
   bool prefetch = false;
+  bool coalesce_inflight = true;
   uint64_t starvation_threshold_ns = 1000000000ULL;
   uint64_t scheduler_decision_cost_ns = 100;
 };

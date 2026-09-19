@@ -81,6 +81,7 @@ class Simulation {
   std::unordered_map<uint64_t, uint64_t> query_latency_;
   SimMetrics metrics_;
   uint64_t decisions_ = 0;
+  std::size_t duplicates_outstanding_ = 0;
   uint64_t last_completion_ns_ = 0;
   uint64_t first_arrival_ns_ = kNoNextBlock;
 };
@@ -115,11 +116,25 @@ void Simulation::request_block(uint64_t block_id, uint64_t query_id, uint64_t no
 
   const auto in_flight = inflight_.find(block_id);
   if (in_flight != inflight_.end()) {
-    in_flight->second.waiters.push_back(Waiter{query_id, now});
-    metrics_.coalesced_requests += 1;
-    if (prefetched_.erase(block_id) > 0) {
-      metrics_.prefetch_hits += 1;
+    if (options_.coalesce_inflight) {
+      in_flight->second.waiters.push_back(Waiter{query_id, now});
+      metrics_.coalesced_requests += 1;
+      if (prefetched_.erase(block_id) > 0) {
+        metrics_.prefetch_hits += 1;
+      }
+      return;
     }
+    metrics_.physical_block_reads += 1;
+    duplicates_outstanding_ += 1;
+    backend_.submit_read(block_id, buffer_for(block_id),
+                         [this, query_id, now](uint64_t, uint64_t, int) {
+                           duplicates_outstanding_ -= 1;
+                           uint64_t& worst = query_latency_[query_id];
+                           const uint64_t wait = backend_.now_ns() - now;
+                           if (wait > worst) {
+                             worst = wait;
+                           }
+                         });
     return;
   }
 
@@ -261,7 +276,7 @@ SimMetrics Simulation::run() {
 
   const uint64_t last_event_ns = events.empty() ? 0 : events.back().time_ns;
   backend_.advance_to(last_event_ns);
-  while (!pending_.empty() || !inflight_.empty()) {
+  while (!pending_.empty() || !inflight_.empty() || duplicates_outstanding_ > 0) {
     try_submit(backend_.now_ns());
     backend_.advance_to(backend_.now_ns() + service_ns() + 1);
   }
@@ -298,6 +313,7 @@ SimConfig config_from_options(const SimOptions& options) {
   config.base_latency_ns = options.base_latency_ns;
   config.io_depth = options.io_depth;
   config.prefetch = options.prefetch;
+  config.coalesce_inflight = options.coalesce_inflight;
   config.starvation_threshold_ns = options.starvation_threshold_ns;
   return config;
 }

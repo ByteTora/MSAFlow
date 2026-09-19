@@ -41,7 +41,8 @@ void usage() {
   std::cerr << "usage: msaflow-sim --trace FILE --policy "
                "{fifo,lru,sharing,urgency,msaflow-v0} --dram-blocks N "
                "[--block-bytes B] [--bandwidth-gbps X] [--io-depth D] "
-               "[--prefetch on|off] [--starvation-threshold-ms MS] [--out FILE]\n";
+               "[--prefetch on|off] [--no-coalesce] "
+               "[--starvation-threshold-ms MS] [--out FILE]\n";
 }
 
 }  // namespace
@@ -88,6 +89,11 @@ int main(int argc, char** argv) {
   }
   if (flag_value(argc, argv, "--prefetch", value)) {
     options.prefetch = (value == "on" || value == "true" || value == "1");
+  }
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--no-coalesce") {
+      options.coalesce_inflight = false;
+    }
   }
   flag_value(argc, argv, "--out", out_path);
 

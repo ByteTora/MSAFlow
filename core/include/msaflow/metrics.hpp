@@ -16,6 +16,7 @@ struct SimConfig {
   uint64_t base_latency_ns = 0;
   uint64_t io_depth = 1;
   bool prefetch = false;
+  bool coalesce_inflight = true;
   uint64_t starvation_threshold_ns = 0;
 };
 
@@ -71,7 +72,8 @@ inline std::string metrics_to_json(const SimConfig& config, const SimMetrics& me
   out << "\"dram_blocks\":" << config.dram_blocks << ",";
   out << "\"block_bytes\":" << config.block_bytes << ",";
   out << "\"io_depth\":" << config.io_depth << ",";
-  out << "\"prefetch\":" << (config.prefetch ? "true" : "false");
+  out << "\"prefetch\":" << (config.prefetch ? "true" : "false") << ",";
+  out << "\"coalesce_inflight\":" << (config.coalesce_inflight ? "true" : "false");
   out << "},";
   out << "\"metrics\":{";
   out << "\"queries\":" << metrics.queries << ",";
