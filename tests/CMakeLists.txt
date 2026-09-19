@@ -6,6 +6,8 @@ add_executable(msaflow_unit_tests
   unit/test_cache.cpp
   unit/test_buffer.cpp
   unit/test_sim_backend.cpp
+  unit/test_trace_reader.cpp
+  unit/test_des.cpp
 )
 target_link_libraries(msaflow_unit_tests PRIVATE msaflow_core msaflow_simulator GTest::gtest_main)
 

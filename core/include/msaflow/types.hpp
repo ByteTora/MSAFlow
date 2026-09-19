@@ -8,7 +8,7 @@
 
 namespace msaflow {
 
-struct Buffer;
+class Buffer;
 
 struct DatabaseId {
   uint64_t id = 0;

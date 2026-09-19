@@ -61,6 +61,15 @@ class CacheManager {
     return &it->second;
   }
 
+  bool touch(const CacheKey& key, uint64_t now_ns) {
+    CacheEntry* entry = find(key);
+    if (entry == nullptr) {
+      return false;
+    }
+    entry->last_access_ns = now_ns;
+    return true;
+  }
+
   bool acquire(const CacheKey& key) {
     CacheEntry* entry = find(key);
     if (entry == nullptr) {
