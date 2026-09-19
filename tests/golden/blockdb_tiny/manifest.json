@@ -1,0 +1,15 @@
+{
+  "block_count": 4,
+  "block_size": 15,
+  "checksum": "sha256:3f58c67c36a585628d33015ae2cd0a227b34f8cbb0e7fcdfaa4c4b3de45c415d",
+  "data_alignment": 4096,
+  "database_id": 1,
+  "database_version": {
+    "major": 1,
+    "minor": 0
+  },
+  "file_bytes": 4096,
+  "format_version": 1,
+  "sequence_count": 5,
+  "total_bytes": 40
+}
