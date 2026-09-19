@@ -1,4 +1,9 @@
-add_executable(msaflow_unit_tests unit/test_types.cpp)
+add_executable(msaflow_unit_tests
+  unit/test_types.cpp
+  unit/test_query_registry.cpp
+  unit/test_block_aggregator.cpp
+  unit/test_priority_policy.cpp
+)
 target_link_libraries(msaflow_unit_tests PRIVATE msaflow_core GTest::gtest_main)
 
 include(GoogleTest)
