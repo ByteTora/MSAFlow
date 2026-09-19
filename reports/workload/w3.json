@@ -1,0 +1,50 @@
+{
+  "trace": "workloads/w3.jsonl",
+  "workload": "w3",
+  "config": {
+    "type": "config",
+    "format_version": 1,
+    "workload": "w3",
+    "db": "uniref90",
+    "num_blocks": 4096,
+    "num_shards": 16,
+    "block_bytes": 134217728,
+    "seed": 7
+  },
+  "windows_ns": [
+    44739243,
+    89478486,
+    447392430
+  ],
+  "dram_fractions": [
+    0.01,
+    0.05,
+    0.25
+  ],
+  "metrics": {
+    "logical_block_requests": 26240,
+    "unique_blocks": 3788,
+    "sharing_factor": 6.927138331573389,
+    "consumers_per_block": {
+      "min": 1,
+      "p50": 7,
+      "p90": 11,
+      "p99": 12,
+      "max": 13,
+      "mean": 6.927138331573389
+    },
+    "coalescible_fraction": {
+      "44739243": 0.2186737804878049,
+      "89478486": 0.39184451219512195,
+      "447392430": 0.833689024390244
+    },
+    "dram_lru_hit_rate": {
+      "0.01": 0.016196646341463415,
+      "0.05": 0.06996951219512196,
+      "0.25": 0.3508003048780488
+    },
+    "query_pairs_overlapping_fraction": 0.1378968253968254,
+    "makespan_ns": 3851740228,
+    "mean_query_duration_ns": 266618005.4375
+  }
+}

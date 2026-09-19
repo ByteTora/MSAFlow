@@ -1,0 +1,50 @@
+{
+  "trace": "workloads/w1.jsonl",
+  "workload": "w1",
+  "config": {
+    "type": "config",
+    "format_version": 1,
+    "workload": "w1",
+    "db": "uniref90",
+    "num_blocks": 4096,
+    "num_shards": 16,
+    "block_bytes": 134217728,
+    "seed": 7
+  },
+  "windows_ns": [
+    44739243,
+    89478486,
+    447392430
+  ],
+  "dram_fractions": [
+    0.01,
+    0.05,
+    0.25
+  ],
+  "metrics": {
+    "logical_block_requests": 262144,
+    "unique_blocks": 4096,
+    "sharing_factor": 64.0,
+    "consumers_per_block": {
+      "min": 64,
+      "p50": 64,
+      "p90": 64,
+      "p99": 64,
+      "max": 64,
+      "mean": 64.0
+    },
+    "coalescible_fraction": {
+      "44739243": 1.0,
+      "89478486": 1.0,
+      "447392430": 1.0
+    },
+    "dram_lru_hit_rate": {
+      "0.01": 0.00390625,
+      "0.05": 0.12359619140625,
+      "0.25": 0.54498291015625
+    },
+    "query_pairs_overlapping_fraction": 1.0,
+    "makespan_ns": 407431331,
+    "mean_query_duration_ns": 256000000.0
+  }
+}
