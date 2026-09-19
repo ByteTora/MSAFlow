@@ -4,7 +4,7 @@ Query-aware, storage-aware data plane for high-throughput protein MSA search.
 
 - Spec: `MSAFlow_Project_Execution_Spec_v1.0.md`
 - Execution plan: `docs/superpowers/plans/2026-09-18-msaflow-phase-0-2.md`
-- Status: Stage R (reference reconnaissance)
+- Status: Stage R + Phase 0 + Phase 1 complete; Phase 2 gated on Linux/NVMe host
 
 ## Layout
 
