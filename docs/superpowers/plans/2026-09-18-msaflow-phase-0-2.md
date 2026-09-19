@@ -10,6 +10,28 @@
 
 **Spec:** `MSAFlow_Project_Execution_Spec_v1.0.md`
 
+## Status (2026-09-19)
+
+Executed: Stage R (R1–R4), Phase 0 (P0.1–P0.3, P0.5), Phase 1 (P1.1–P1.7) — all tasks below
+complete and committed; Phase 0 gate = PASS (conditional), Phase 1 gate = PASS.
+P0.4 (real-trace calibration) deferred: needs Linux + real databases.
+
+Not started: Phase 2. Entry criteria and task shape live in
+`docs/phase2-entry-criteria.md`; the simulator `StorageBackend` seam is `core/include/msaflow/io_backend.hpp`.
+
+Deviations from this plan, recorded honestly:
+
+- Phase 1 simulator is C++20 (shared `core/`), not Python — single implementation reused by Phase 2.
+- `policy` is a scheduling policy; a separate `--no-coalesce` flag supplies the generic baseline
+  (the gate's real comparison), since replay makes the five policies near-identical.
+- Sweeps are deterministic (no RNG), so the planned seed dimension was dropped; `-nc` baselines
+  run only at the 0.25 DRAM reference to bound runtime.
+- `SimOptions` priority defaults are scale-dependent (`sharing_weight=1e6` for ns-domain inputs);
+  tunable, not a project conclusion (spec §7.3).
+- `drain` in `simulator/des.cpp` re-submits pending work each iteration; an early version omitted
+  this and could loop — fixed and covered by `Des.DrainsPendingBacklogForDisjointBlocks`.
+
+
 ## Global Constraints
 
 - **禁止提前实现**（spec §3.2 / Rule 5）：GPU-HMMER、MMseqs2-GPU、HBM、GDS、RDMA、NVMe-oF、分布式调度、ML scheduler、HMMER 分数/filter kernel 改动。Phase 0/1 内只允许 spec §20 列出的策略。
