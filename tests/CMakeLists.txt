@@ -4,8 +4,10 @@ add_executable(msaflow_unit_tests
   unit/test_block_aggregator.cpp
   unit/test_priority_policy.cpp
   unit/test_cache.cpp
+  unit/test_buffer.cpp
+  unit/test_sim_backend.cpp
 )
-target_link_libraries(msaflow_unit_tests PRIVATE msaflow_core GTest::gtest_main)
+target_link_libraries(msaflow_unit_tests PRIVATE msaflow_core msaflow_simulator GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(msaflow_unit_tests)
