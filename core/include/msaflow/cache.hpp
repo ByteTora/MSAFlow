@@ -61,6 +61,8 @@ class CacheManager {
     return &it->second;
   }
 
+  bool contains(const CacheKey& key) const { return entries_.find(key) != entries_.end(); }
+
   bool touch(const CacheKey& key, uint64_t now_ns) {
     CacheEntry* entry = find(key);
     if (entry == nullptr) {

@@ -36,6 +36,10 @@ struct SimMetrics {
   uint64_t scheduler_decisions = 0;
   uint64_t scheduler_decision_ns_total = 0;
   uint64_t makespan_ns = 0;
+  // Runtime-only storage stats (not part of the simulator's serialized metrics,
+  // which keeps the committed golden fixture byte-stable).
+  uint64_t storage_wait_ns_total = 0;
+  uint64_t storage_wait_events = 0;
   std::vector<uint64_t> query_latency_ns;
 };
 
@@ -64,18 +68,22 @@ inline double throughput_qps(const SimMetrics& metrics) {
   return static_cast<double>(metrics.queries) * 1e9 / static_cast<double>(metrics.makespan_ns);
 }
 
-inline std::string metrics_to_json(const SimConfig& config, const SimMetrics& metrics) {
+inline std::string config_to_json(const SimConfig& config) {
   std::ostringstream out;
   out << "{";
-  out << "\"config\":{";
   out << "\"policy\":\"" << config.policy << "\",";
   out << "\"dram_blocks\":" << config.dram_blocks << ",";
   out << "\"block_bytes\":" << config.block_bytes << ",";
   out << "\"io_depth\":" << config.io_depth << ",";
   out << "\"prefetch\":" << (config.prefetch ? "true" : "false") << ",";
   out << "\"coalesce_inflight\":" << (config.coalesce_inflight ? "true" : "false");
-  out << "},";
-  out << "\"metrics\":{";
+  out << "}";
+  return out.str();
+}
+
+inline std::string metrics_body_to_json(const SimMetrics& metrics) {
+  std::ostringstream out;
+  out << "{";
   out << "\"queries\":" << metrics.queries << ",";
   out << "\"logical_block_requests\":" << metrics.logical_block_requests << ",";
   out << "\"physical_block_reads\":" << metrics.physical_block_reads << ",";
@@ -96,8 +104,13 @@ inline std::string metrics_to_json(const SimConfig& config, const SimMetrics& me
   out << "\"latency_p95_ns\":" << percentile(metrics.query_latency_ns, 0.95) << ",";
   out << "\"latency_p99_ns\":" << percentile(metrics.query_latency_ns, 0.99) << ",";
   out << "\"throughput_qps\":" << throughput_qps(metrics);
-  out << "}}";
+  out << "}";
   return out.str();
+}
+
+inline std::string metrics_to_json(const SimConfig& config, const SimMetrics& metrics) {
+  return "{\"config\":" + config_to_json(config) + ",\"metrics\":" +
+         metrics_body_to_json(metrics) + "}";
 }
 
 }  // namespace msaflow
