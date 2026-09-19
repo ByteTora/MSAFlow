@@ -17,5 +17,8 @@ Notes:
 - LMCache documentation paths referenced by the spec (`docs/source/developer_guide/extending_lmcache/storage_plugins.rst`) exist on `dev`, not on `main` (404 on main). Pin branch is `dev`.
 - HMMER does not vendor Easel; it expects a sibling checkout (`third_party/hmmer/README.md:58`, `configure.ac:64-67`). Easel is cloned separately and pinned above.
 - vLLM and LMCache are partial clones (`--filter=blob:none`); file contents are fetched lazily. Commit hashes are full.
+- liburing is built locally for Phase 2: `./configure --prefix=third_party/liburing/_install && make && make install`
+  (gitignored, no system install). CMake picks it up from that prefix and defines `MSAFLOW_HAVE_IO_URING`.
+  Kernel 5.10 / `CONFIG_IO_URING=y`; basic `IORING_OP_READ` works, no IOPOLL/multishot assumed.
 - liburing checkout reports a case-collision warning on case-insensitive filesystems (`man/IO_URING_CHECK_VERSION.3` vs `man/io_uring_check_version.3`). Harmless for reference reading; never build in-tree from this checkout.
 - Reference checkouts are read-only inputs. MSAFlow code must not import from `third_party/` paths.

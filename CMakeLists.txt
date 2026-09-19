@@ -12,6 +12,8 @@ target_compile_options(msaflow_core INTERFACE -Wall -Wextra)
 
 enable_testing()
 
+find_package(Python3 COMPONENTS Interpreter)
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -22,4 +24,6 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(simulator)
+add_subdirectory(storage)
+add_subdirectory(runtime)
 add_subdirectory(tests)
