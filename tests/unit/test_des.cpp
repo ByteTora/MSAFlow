@@ -109,6 +109,28 @@ TEST(Des, DrainsPendingBacklogForDisjointBlocks) {
   EXPECT_NEAR(coalescing_ratio(metrics), 0.0, 1e-9);
 }
 
+TEST(Des, PrefetchIssuedOncePerBlockAndConsumed) {
+  SimOptions options = base_options();
+  options.prefetch = true;
+  Trace trace;
+  trace.config.num_blocks = 4;
+  for (uint64_t q = 0; q < 2; ++q) {
+    TraceQuery query;
+    query.query_id = q;
+    query.arrival_ns = q * 10;
+    TraceStream stream;
+    stream.first_block_ns = query.arrival_ns;
+    stream.block_interval_ns = 100;
+    stream.blocks = {0, 1, 2};
+    query.streams.push_back(stream);
+    trace.queries.push_back(query);
+  }
+  const SimMetrics metrics = run_simulation(trace, options);
+  EXPECT_EQ(metrics.prefetch_issued, 2u);
+  EXPECT_EQ(metrics.prefetch_hits, 2u);
+  EXPECT_EQ(metrics.prefetch_waste, 0u);
+}
+
 TEST(Des, IsDeterministic) {
   const SimOptions options = base_options();
   const SimMetrics first = run_simulation(tight_trace(4), options);

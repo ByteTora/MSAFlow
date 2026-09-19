@@ -24,4 +24,6 @@ struct SimOptions {
 
 SimMetrics run_simulation(const Trace& trace, const SimOptions& options);
 
+SimConfig config_from_options(const SimOptions& options);
+
 }  // namespace msaflow

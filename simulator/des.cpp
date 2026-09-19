@@ -65,6 +65,7 @@ class Simulation {
   Buffer* buffer_for(uint64_t) { return scratch_buffer_.get(); }
 
   void request(uint64_t block_id, uint64_t next_block, uint64_t query_id, uint64_t now);
+  void request_block(uint64_t block_id, uint64_t query_id, uint64_t now);
   void maybe_prefetch(uint64_t block_id, uint64_t now);
   void try_submit(uint64_t now);
   void handle_completion(uint64_t block_id, uint64_t now);
@@ -85,6 +86,13 @@ class Simulation {
 };
 
 void Simulation::request(uint64_t block_id, uint64_t next_block, uint64_t query_id, uint64_t now) {
+  request_block(block_id, query_id, now);
+  if (options_.prefetch && next_block != kNoNextBlock) {
+    maybe_prefetch(next_block, now);
+  }
+}
+
+void Simulation::request_block(uint64_t block_id, uint64_t query_id, uint64_t now) {
   metrics_.logical_block_requests += 1;
   const CacheKey cache_key = key(block_id);
 
@@ -126,10 +134,6 @@ void Simulation::request(uint64_t block_id, uint64_t next_block, uint64_t query_
   block.waiters.push_back(Waiter{query_id, now});
   pending_.emplace(block_id, std::move(block));
   try_submit(now);
-
-  if (options_.prefetch && next_block != kNoNextBlock) {
-    maybe_prefetch(next_block, now);
-  }
 }
 
 void Simulation::maybe_prefetch(uint64_t block_id, uint64_t now) {
@@ -283,6 +287,19 @@ SimMetrics Simulation::run() {
 SimMetrics run_simulation(const Trace& trace, const SimOptions& options) {
   Simulation simulation(trace, options);
   return simulation.run();
+}
+
+SimConfig config_from_options(const SimOptions& options) {
+  SimConfig config;
+  config.policy = options.policy_name;
+  config.dram_blocks = options.dram_blocks;
+  config.block_bytes = options.block_bytes;
+  config.bandwidth_bytes_per_ns = options.bandwidth_bytes_per_ns;
+  config.base_latency_ns = options.base_latency_ns;
+  config.io_depth = options.io_depth;
+  config.prefetch = options.prefetch;
+  config.starvation_threshold_ns = options.starvation_threshold_ns;
+  return config;
 }
 
 }  // namespace msaflow

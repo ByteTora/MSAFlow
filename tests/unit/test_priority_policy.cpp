@@ -57,6 +57,12 @@ TEST(PriorityPolicy, MsaflowV0CombinesSharingUrgencyAndIoCost) {
   EXPECT_LT(costly, base);
 }
 
+TEST(PriorityPolicy, AgingOutweighsMaximumSharing) {
+  const double aged = priority_score(PolicyKind::MSAFLOW_V0, input(1, 1000000000ULL, 0, 1, 0));
+  const double fresh = priority_score(PolicyKind::MSAFLOW_V0, input(64, 0, 0, 2, 0));
+  EXPECT_GT(aged, fresh);
+}
+
 TEST(PriorityPolicy, ParamsControlWeights) {
   PolicyParams sharing_off;
   sharing_off.sharing_weight = 0.0;

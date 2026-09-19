@@ -1,0 +1,4 @@
+{"type":"config","format_version":1,"db":"tiny","num_blocks":4,"num_shards":1,"block_bytes":1000,"seed":1}
+{"type":"query","query_id":0,"db":"tiny","arrival_ns":0,"streams":[{"shard_id":0,"first_block_ns":0,"block_interval_ns":100,"blocks":[0,1,2]}]}
+{"type":"query","query_id":1,"db":"tiny","arrival_ns":10,"streams":[{"shard_id":0,"first_block_ns":10,"block_interval_ns":100,"blocks":[0,1,2]}]}
+{"type":"query","query_id":2,"db":"tiny","arrival_ns":20,"streams":[{"shard_id":0,"first_block_ns":20,"block_interval_ns":100,"blocks":[0,1,2]}]}

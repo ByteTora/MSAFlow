@@ -92,15 +92,7 @@ int main(int argc, char** argv) {
   flag_value(argc, argv, "--out", out_path);
 
   const msaflow::SimMetrics metrics = msaflow::run_simulation(trace, options);
-  msaflow::SimConfig config;
-  config.policy = options.policy_name;
-  config.dram_blocks = options.dram_blocks;
-  config.block_bytes = options.block_bytes;
-  config.bandwidth_bytes_per_ns = options.bandwidth_bytes_per_ns;
-  config.base_latency_ns = options.base_latency_ns;
-  config.io_depth = options.io_depth;
-  config.prefetch = options.prefetch;
-  config.starvation_threshold_ns = options.starvation_threshold_ns;
+  const msaflow::SimConfig config = msaflow::config_from_options(options);
 
   const std::string json = msaflow::metrics_to_json(config, metrics) + "\n";
   if (out_path.empty()) {
