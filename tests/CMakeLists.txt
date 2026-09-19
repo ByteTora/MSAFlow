@@ -3,6 +3,7 @@ add_executable(msaflow_unit_tests
   unit/test_query_registry.cpp
   unit/test_block_aggregator.cpp
   unit/test_priority_policy.cpp
+  unit/test_cache.cpp
 )
 target_link_libraries(msaflow_unit_tests PRIVATE msaflow_core GTest::gtest_main)
 
