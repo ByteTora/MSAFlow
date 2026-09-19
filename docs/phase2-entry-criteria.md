@@ -1,15 +1,20 @@
 # Phase 2 entry criteria (Local Storage Runtime)
 
-Phase 2 is not started in this round. These are the gating conditions and the task
-shape for when it does start. No Phase 2 code exists yet.
+Status (2026-09-19): **Phase 2A and 2B implemented** on a Linux dev host
+(`msaflow-runtime`, `PreadBackend`, `IoUringBackend`, Block DB builder,
+`BufferPool`, cross-check harness, storage benchmark). See
+[`reports/phase2-storage.md`](../reports/phase2-storage.md),
+[`benchmark_runs/`](../benchmark_runs), and [`docs/known-issues.md`](known-issues.md).
+
+The conditions below were the original gate; all three were satisfied.
 
 ## Entry conditions (all three)
 
 1. Phase 1 gate PASS — achieved (see `reports/scheduler-baseline.md`).
-2. A Linux host with NVMe SSD is available (io_uring-capable kernel). The dev
-   workstation is macOS — `core/` and `simulator/` are portable, but the
-   `LocalNvmeBackend` and its benchmark require Linux.
-3. Explicit user go-ahead to implement Phase 2.
+2. A Linux host with a block device is available (kernel 5.10, `CONFIG_IO_URING=y`).
+   The dev device is an Alibaba Cloud EBS volume, not physical NVMe, so Phase 2
+   numbers are indicative and relative, not absolute.
+3. Explicit user go-ahead to implement Phase 2 — given.
 
 ## Environment checklist (record per benchmark, spec Rule 4)
 

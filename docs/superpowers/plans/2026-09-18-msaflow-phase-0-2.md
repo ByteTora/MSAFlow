@@ -19,6 +19,12 @@ P0.4 (real-trace calibration) deferred: needs Linux + real databases.
 Not started: Phase 2. Entry criteria and task shape live in
 `docs/phase2-entry-criteria.md`; the simulator `StorageBackend` seam is `core/include/msaflow/io_backend.hpp`.
 
+Checkbox reconciliation (2026-09-19): every task step in this plan is now marked `[x]`.
+The checkboxes had been left unticked even though the Status section above already
+recorded the work as complete and committed. Note that `third_party/` reference
+checkouts are gitignored, so a fresh clone contains only `third_party/REFERENCES.md`
+(the R2 deliverable) and not the reference repo working trees.
+
 Deviations from this plan, recorded honestly:
 
 - Phase 1 simulator is C++20 (shared `core/`), not Python — single implementation reused by Phase 2.
@@ -105,7 +111,7 @@ reports/scheduler/*.json           # P1.7
 - [x] **Step 2:** 写 `.gitignore`（build/、third_party/* 除 REFERENCES.md、data/、workloads/*.jsonl、__pycache__、.venv）
 - [x] **Step 3:** 写 `README.md`、取 Apache-2.0 `LICENSE`
 - [x] **Step 4:** 写本 plan 文档
-- [ ] **Step 5:** `git add -A && git commit -m "chore: initialize msaflow repo with execution plan"`
+- [x] **Step 5:** `git add -A && git commit -m "chore: initialize msaflow repo with execution plan"`
 
 **Verify:** `git log --oneline` 出现该 commit；`git status` 干净。
 
@@ -113,7 +119,7 @@ reports/scheduler/*.json           # P1.7
 
 **Files:** Create `third_party/REFERENCES.md`
 
-- [ ] **Step 1:** clone（顺序执行，大仓用 partial clone）：
+- [x] **Step 1:** clone（顺序执行，大仓用 partial clone）：
 
 ```bash
 git clone https://github.com/google-deepmind/alphafold3.git third_party/alphafold3
@@ -124,8 +130,8 @@ git clone --filter=blob:none https://github.com/LMCache/LMCache.git third_party/
 git -C third_party/LMCache checkout dev
 ```
 
-- [ ] **Step 2:** 对每个 repo `git rev-parse HEAD` 与 `git rev-parse --abbrev-ref HEAD`，写入 `REFERENCES.md` 表格（Project / URL / branch / commit / 用途 / clone date）。
-- [ ] **Step 3:** commit：`chore(third_party): pin reference repositories`
+- [x] **Step 2:** 对每个 repo `git rev-parse HEAD` 与 `git rev-parse --abbrev-ref HEAD`，写入 `REFERENCES.md` 表格（Project / URL / branch / commit / 用途 / clone date）。
+- [x] **Step 3:** commit：`chore(third_party): pin reference repositories`
 
 **Verify:** `REFERENCES.md` 5 行 commit hash 与 `rev-parse` 输出一致；`git status --porcelain third_party` 为空（除 REFERENCES.md 外全被 ignore）。
 
@@ -135,18 +141,18 @@ git -C third_party/LMCache checkout dev
 
 **Interfaces:** 本任务产出的“seam 清单”是 Task P1.4（StorageBackend 接口）与未来 Phase 3 的唯一依据。
 
-- [ ] **Step 1:** 并行派 3 个 explorer 子代理读：
+- [x] **Step 1:** 并行派 3 个 explorer 子代理读：
   - (a) AF3：`docs/performance.md`、`src/alphafold3/data/pipeline.py`、`msa_config.py`、`tools/jackhmmer.py`、`tools/shards.py`、`run_alphafold.py`
   - (b) HMMER：`src/jackhmmer.c`（重点 `esl_sqio_Read` / `esl_sqio_ReadBlock` / `next_block` 调用点与循环）、`src/p7_pipeline.c`（sequence 消费入口）、`easel/esl_sqio.*` 接口
   - (c) liburing `examples/`（io_uring 提交/收割模式、O_DIRECT 对齐要求）、vLLM `vllm/v1/core/block_pool.py` + `vllm/v1/core/sched/scheduler.py`（ref-count / eviction 对象模型）、LMCache `docs/source/developer_guide/extending_lmcache/storage_plugins.rst`（tier 插件接口）
-- [ ] **Step 2:** 合并为 `docs/repo-reading-notes.md`，必须含：
+- [x] **Step 2:** 合并为 `docs/repo-reading-notes.md`，必须含：
   - AF3 MSA 执行路径（每 DB 一个 tool、sharded 时 shard fan-out 并行、n_iter=1 约束、Z/domZ、`_merge_jackhmmer_results`）
   - HMMER target DB 读取路径函数级链路 + **集成 seam 清单**（替换 Easel `ESL_SQFILE` 读层；`p7_pipeline.c` 禁改）
   - AF3 配置抽象点（`DatabaseConfig.path` → `msa://<db>/<version>` 候选）
   - vLLM/LMCache 可借鉴对象模型（ref-count、block pool、storage plugin），注明“参考不复制”
   - **假设清单**（表格：假设 / 验证来源 file:line / 状态）
-- [ ] **Step 3:** 我本人抽查每条假设的关键 file:line，删掉无证据条目或降级为 open question。
-- [ ] **Step 4:** commit：`docs: add reference repo reading notes`
+- [x] **Step 3:** 我本人抽查每条假设的关键 file:line，删掉无证据条目或降级为 open question。
+- [x] **Step 4:** commit：`docs: add reference repo reading notes`
 
 **Verify:** notes 能回答三问：块级读经过哪个函数？谁决定下一个读哪个 sequence？page cache 命中发生在哪一层？
 
@@ -154,8 +160,8 @@ git -C third_party/LMCache checkout dev
 
 **Files:** Modify `docs/repo-reading-notes.md`（追加一节 `Phase 0 parameter freeze`）
 
-- [ ] **Step 1:** 依据 R3 证据确定：`num_blocks`、`num_shards`、`block_bytes`、默认并发数、`n_iter` 语义（1 次全库扫描/query）。
-- [ ] **Step 2:** 写入 notes 并 commit：`docs: freeze phase-0 workload parameters`
+- [x] **Step 1:** 依据 R3 证据确定：`num_blocks`、`num_shards`、`block_bytes`、默认并发数、`n_iter` 语义（1 次全库扫描/query）。
+- [x] **Step 2:** 写入 notes 并 commit：`docs: freeze phase-0 workload parameters`
 
 **Verify:** 参数逐项标注来源（spec 条款或源码 file:line），无“拍脑袋”值。
 
@@ -176,11 +182,11 @@ git -C third_party/LMCache checkout dev
   - W3 low-overlap：随机连续 block 窗口，窗口间少量交叠
   - W4 zero-overlap：DB 划分为互不相交的组，每 query 独占一组
 
-- [ ] **Step 1:** 写失败测试：同 seed 输出字节一致；config 行 `format_version==1`；stream 内 block 时刻单调递增且等于 `first_block_ns + i*interval`；W4 任两 query 的 block 集合交集为空。
-- [ ] **Step 2:** 运行确认失败：`python3 -m unittest discover -s tools -p "test_*.py" -t .`
-- [ ] **Step 3:** 最小实现生成器（stdlib `random.Random(seed)`，零依赖）。
-- [ ] **Step 4:** 测试通过；4 个 workload 生成到 `workloads/` 并人工抽查一行。
-- [ ] **Step 5:** commit：`feat(trace): add msa workload trace generator`
+- [x] **Step 1:** 写失败测试：同 seed 输出字节一致；config 行 `format_version==1`；stream 内 block 时刻单调递增且等于 `first_block_ns + i*interval`；W4 任两 query 的 block 集合交集为空。
+- [x] **Step 2:** 运行确认失败：`python3 -m unittest discover -s tools -p "test_*.py" -t .`
+- [x] **Step 3:** 最小实现生成器（stdlib `random.Random(seed)`，零依赖）。
+- [x] **Step 4:** 测试通过；4 个 workload 生成到 `workloads/` 并人工抽查一行。
+- [x] **Step 5:** commit：`feat(trace): add msa workload trace generator`
 
 **Verify:** 上述 unittest 全绿；生成 `workloads/w1..w4.jsonl` 成功且 W4 交集断言成立。
 
@@ -192,11 +198,11 @@ git -C third_party/LMCache checkout dev
 
 - 静态指标（spec §18.3/§19）：`logical_block_requests`、`unique_blocks`、`sharing_factor = logical/unique`、per-block consumer 分布（p50/p90/p99）、query 对 Jaccard 均值
 - 时间指标（本计划新增，Phase 0 Gate 的决定性依据）：per-block 相邻消费者 gap 分布；`coalescible_fraction(window)`；reuse-distance 分布 → 各 DRAM 比例下 LRU 命中率估计；每 query 对的时间重叠率
-- [ ] **Step 1:** 写失败测试：手工构造 8 行 fixture，断言 `sharing_factor`、`coalescible_fraction`、LRU 命中率精确值；W4 上 `sharing_factor == 1.0`。
-- [ ] **Step 2:** 运行确认失败。
-- [ ] **Step 3:** 最小实现（flat 兼容解析 + streams 解析）。
-- [ ] **Step 4:** 测试通过；对 W1–W4 各跑一次 → `reports/workload/*.json`。
-- [ ] **Step 5:** commit：`feat(trace): add workload analyzer with temporal metrics`
+- [x] **Step 1:** 写失败测试：手工构造 8 行 fixture，断言 `sharing_factor`、`coalescible_fraction`、LRU 命中率精确值；W4 上 `sharing_factor == 1.0`。
+- [x] **Step 2:** 运行确认失败。
+- [x] **Step 3:** 最小实现（flat 兼容解析 + streams 解析）。
+- [x] **Step 4:** 测试通过；对 W1–W4 各跑一次 → `reports/workload/*.json`。
+- [x] **Step 5:** commit：`feat(trace): add workload analyzer with temporal metrics`
 
 **Verify:** unittest 全绿；`reports/workload/*.json` 可 `python3 -m json.tool` 解析。
 
@@ -204,13 +210,13 @@ git -C third_party/LMCache checkout dev
 
 **Files:** Create `reports/workload-characterization.md`（D4）
 
-- [ ] **Step 1:** 汇总四 workload 结果表：`sharing_factor`、`coalescible_fraction`（1×/2×/10× 传输窗口）、各 DRAM 比例 LRU 命中率、时间重叠率。
-- [ ] **Step 2:** 明确回答 spec Phase 0 验收问题：“每个 physical block 平均有多少 potential consumer”。
-- [ ] **Step 3:** 记录 Gate 判定：
+- [x] **Step 1:** 汇总四 workload 结果表：`sharing_factor`、`coalescible_fraction`（1×/2×/10× 传输窗口）、各 DRAM 比例 LRU 命中率、时间重叠率。
+- [x] **Step 2:** 明确回答 spec Phase 0 验收问题：“每个 physical block 平均有多少 potential consumer”。
+- [x] **Step 3:** 记录 Gate 判定：
   - 继续条件：存在 workload 使 `coalescible_fraction` 或 DRAM 复用显著 > 0；
   - 停止条件（Rule 6）：所有 workload `sharing_factor ≈ 1.0` 且 `coalescible_fraction < 5%` → 停止并上报，不进入 Phase 1 功能实现。
-- [ ] **Step 4:** 注明 P0.4（真实 trace 校准）因无 Linux+真实 DB 环境暂缓，方法与所需环境写入“future validation”一节。
-- [ ] **Step 5:** commit：`docs(phase0): add workload characterization report with gate decision`
+- [x] **Step 4:** 注明 P0.4（真实 trace 校准）因无 Linux+真实 DB 环境暂缓，方法与所需环境写入“future validation”一节。
+- [x] **Step 5:** commit：`docs(phase0): add workload characterization report with gate decision`
 
 **Verify:** Gate 判定为显式 PASS/STOP 二值；若 STOP，立即暂停并等用户裁决。
 
@@ -224,11 +230,11 @@ git -C third_party/LMCache checkout dev
 
 **Interfaces:** §5 全部类型：`DatabaseId{uint64_t id}`、`DatabaseVersion{major,minor}`、`DatabaseMeta`、`BlockMeta`、`QueryStatus`(enum class)、`QueryState`、`BlockState`、`CacheClass`、`BlockRuntime`、`InflightRequest`、`CacheKey{db_id,db_version,block_id}` + `operator==` / hash。
 
-- [ ] **Step 1:** 写失败测试：构造各类型、断言字段默认值；`CacheKey` 相等/哈希。
-- [ ] **Step 2:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j && ctest --test-dir build --output-on-failure` 确认失败（目标不存在）。
-- [ ] **Step 3:** 最小实现 CMake（C++20、FetchContent GoogleTest `v1.15.2`）+ types.hpp。
-- [ ] **Step 4:** 构建通过、ctest 全绿。
-- [ ] **Step 5:** commit：`feat(core): add core data types and build skeleton`
+- [x] **Step 1:** 写失败测试：构造各类型、断言字段默认值；`CacheKey` 相等/哈希。
+- [x] **Step 2:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build -j && ctest --test-dir build --output-on-failure` 确认失败（目标不存在）。
+- [x] **Step 3:** 最小实现 CMake（C++20、FetchContent GoogleTest `v1.15.2`）+ types.hpp。
+- [x] **Step 4:** 构建通过、ctest 全绿。
+- [x] **Step 5:** commit：`feat(core): add core data types and build skeleton`
 
 **Verify:** `ctest` 全绿；构建日志无 warning（-Wall -Wextra）。
 
@@ -242,11 +248,11 @@ git -C third_party/LMCache checkout dev
 - `enum class PolicyKind {FIFO, LRU_sharing, SHARING_ONLY, URGENCY_ONLY, MSAFLOW_V0}`；`double score(kind, const BlockRuntime&, wait_ns, io_cost_ns)`，MSAFLOW_V0 按 spec §7.3：`α*urgency + β*log2(1+consumers) - γ*io_cost`。
 - 常量 `α/β/γ` 暴露为参数（默认 1.0/1.0/1.0e-6），不写死结论（spec §8.4 要求可调参）。
 
-- [ ] **Step 1:** 失败测试：aggregation 合并同 block 消费者（spec §7.1 的 B100→Q1,Q3 例子）；FIFO 相等分数保序；sharing 高的 block 先于低 sharing；wait 增长后 urgency-only 反超（aging 无饥饿场景）。
-- [ ] **Step 2:** 确认失败。
-- [ ] **Step 3:** 最小实现。
-- [ ] **Step 4:** ctest 全绿。
-- [ ] **Step 5:** commit：`feat(scheduler): add query registry aggregation and priority policy`
+- [x] **Step 1:** 失败测试：aggregation 合并同 block 消费者（spec §7.1 的 B100→Q1,Q3 例子）；FIFO 相等分数保序；sharing 高的 block 先于低 sharing；wait 增长后 urgency-only 反超（aging 无饥饿场景）。
+- [x] **Step 2:** 确认失败。
+- [x] **Step 3:** 最小实现。
+- [x] **Step 4:** ctest 全绿。
+- [x] **Step 5:** commit：`feat(scheduler): add query registry aggregation and priority policy`
 
 **Verify:** ctest 全绿；聚合用例输出与 spec §7.1 完全一致。
 
@@ -256,11 +262,11 @@ git -C third_party/LMCache checkout dev
 
 **Interfaces:** `CacheManager(capacity_blocks)`；`admit(CacheKey, CacheClass)`, `lookup(CacheKey)`, `release(CacheKey)`, `evict_to_low_watermark()`, stats（occupancy、evictions、hits by class）。`keep_score = 2*log2(1+active) + 3*log2(1+future) + recency_bonus`（spec §8.4），系数为构造参数；HIGH=90%/LOW=75% 可配。
 
-- [ ] **Step 1:** 失败测试：active_consumers>0 的 block 不可驱逐；streaming block 在最后消费者 release 后立即可回收；容量到 HIGH 触发驱逐至 LOW；keep_score 排序正确。
-- [ ] **Step 2:** 确认失败。
-- [ ] **Step 3:** 最小实现（单 map + 简单扫描驱逐；不引 heap 优化，样本量不需要）。
-- [ ] **Step 4:** ctest 全绿。
-- [ ] **Step 5:** commit：`feat(cache): add shared streaming pools and eviction`
+- [x] **Step 1:** 失败测试：active_consumers>0 的 block 不可驱逐；streaming block 在最后消费者 release 后立即可回收；容量到 HIGH 触发驱逐至 LOW；keep_score 排序正确。
+- [x] **Step 2:** 确认失败。
+- [x] **Step 3:** 最小实现（单 map + 简单扫描驱逐；不引 heap 优化，样本量不需要）。
+- [x] **Step 4:** ctest 全绿。
+- [x] **Step 5:** commit：`feat(cache): add shared streaming pools and eviction`
 
 ### Task P1.4: StorageBackend 接口 + SimulatedBackend
 
@@ -282,11 +288,11 @@ class SimulatedBackend : public StorageBackend {  // 参数：block_bytes, bandw
 };
 ```
 - Phase 2 的 io_uring backend 实现同一接口（本任务只定义接口）。
-- [ ] **Step 1:** 失败测试：QD=1 时两次 submit 串行完成；QD≥2 时完成时刻重叠；完成顺序 FIFO；错误注入路径回调 `err != 0`。
-- [ ] **Step 2:** 确认失败。
-- [ ] **Step 3:** 最小实现（内部 pending 队列 + 单调时钟）。
-- [ ] **Step 4:** ctest 全绿。
-- [ ] **Step 5:** commit：`feat(storage): add storage backend interface and simulated backend`
+- [x] **Step 1:** 失败测试：QD=1 时两次 submit 串行完成；QD≥2 时完成时刻重叠；完成顺序 FIFO；错误注入路径回调 `err != 0`。
+- [x] **Step 2:** 确认失败。
+- [x] **Step 3:** 最小实现（内部 pending 队列 + 单调时钟）。
+- [x] **Step 4:** ctest 全绿。
+- [x] **Step 5:** commit：`feat(storage): add storage backend interface and simulated backend`
 
 ### Task P1.5: Simulator CLI + DES + metrics
 
@@ -296,29 +302,29 @@ class SimulatedBackend : public StorageBackend {  // 参数：block_bytes, bandw
 - CLI（flag 与 spec §38 D3 一致）：`msaflow-sim --trace FILE --policy {fifo,lru,sharing,urgency,msaflow-v0} --dram-blocks N [--seed S] [--block-bytes B] [--bandwidth-gbps X] [--io-depth D] [--prefetch on|off] [--out FILE]`
 - 事件：`QueryArrive` / `RequestBlock` / `BlockReady` / `QueryDone`；队列为 `std::priority_queue`（time, insertion-order）保证确定性。
 - metrics（spec §18 子集）：`physical_block_reads`、`logical_block_requests`、`coalescing_ratio = 1 - physical/logical`、`shared_cache_hits`、`streaming_hits`、`prefetch_hits`、`prefetch_waste`、`evictions`、`dram_occupancy_peak`、`starvation_count`、`scheduler_decision_ns_total`、latency p50/p95/p99、`throughput_qps`；输出 JSON。
-- [ ] **Step 1:** 失败测试：3-query 小 trace 下 `msaflow-v0` 的 physical reads < `fifo`；同 seed 两次运行 metrics JSON 字节一致；trace_reader flat 兼容用例。
-- [ ] **Step 2:** 确认失败。
-- [ ] **Step 3:** 最小实现（单线程 DES；无线程池）。
-- [ ] **Step 4:** ctest 全绿；手工跑 W1 一次输出可读 JSON。
-- [ ] **Step 5:** commit：`feat(sim): add discrete-event simulator with policies and metrics`
+- [x] **Step 1:** 失败测试：3-query 小 trace 下 `msaflow-v0` 的 physical reads < `fifo`；同 seed 两次运行 metrics JSON 字节一致；trace_reader flat 兼容用例。
+- [x] **Step 2:** 确认失败。
+- [x] **Step 3:** 最小实现（单线程 DES；无线程池）。
+- [x] **Step 4:** ctest 全绿；手工跑 W1 一次输出可读 JSON。
+- [x] **Step 5:** commit：`feat(sim): add discrete-event simulator with policies and metrics`
 
 ### Task P1.6: 全量单测 + starvation/确定性 golden
 
 **Files:** Modify `tests/unit/*`；Create `tests/golden/{tiny_w1.jsonl,tiny_w1_msaflow.json}`
 
-- [ ] **Step 1:** 补 spec §32 unit 清单：cursor 推进、inflight attach、cache admission、eviction、priority、cancellation、database version mismatch、prefetch 规则（READY/INFLIGHT/拥塞时跳过）、QD 背压、aging 无饥饿断言（构造对抗 workload 跑 N 事件后 `starvation_count == 0`）。
-- [ ] **Step 2:** golden：`tiny_w1` 在小 DRAM 下 msaflow-v0 结果与提交的 JSON 完全一致（防回归）。
-- [ ] **Step 3:** ctest 全绿；commit：`test(sim): add full unit suite starvation and golden coverage`
+- [x] **Step 1:** 补 spec §32 unit 清单：cursor 推进、inflight attach、cache admission、eviction、priority、cancellation、database version mismatch、prefetch 规则（READY/INFLIGHT/拥塞时跳过）、QD 背压、aging 无饥饿断言（构造对抗 workload 跑 N 事件后 `starvation_count == 0`）。
+- [x] **Step 2:** golden：`tiny_w1` 在小 DRAM 下 msaflow-v0 结果与提交的 JSON 完全一致（防回归）。
+- [x] **Step 3:** ctest 全绿；commit：`test(sim): add full unit suite starvation and golden coverage`
 
 ### Task P1.7: Sweep + scheduler-baseline 报告 + Gate
 
 **Files:** Create `tools/run_sweeps.py`, `tools/report_scheduler.py`, `reports/scheduler-baseline.md`（D5）
 
-- [ ] **Step 1:** `run_sweeps.py`：W1–W4 × policies{5} × dram{1%,5%,25%,100%} × seed{1..5} 调 `msaflow-sim`，输出 `reports/scheduler/<workload>_<policy>_dram<f>_s<seed>.json`。
-- [ ] **Step 2:** `report_scheduler.py` 聚合为 markdown 表格（physical reads、coalescing ratio、p95、starvation、overhead）。
-- [ ] **Step 3:** Gate 判定（spec §20）：W1/W2 上 msaflow-v0 相对 generic LRU：physical reads 更少 ∧ coalescing ratio 更高 ∧ `starvation_count == 0` ∧ `scheduler_decision_ns_total / simulated_wall_ns < 1%`。输出 PASS/FAIL。
-- [ ] **Step 4:** 若 FAIL：只调 policy 参数/逻辑，不扩功能（Rule 5）；FAIL 未解决前不进入 Phase 2。
-- [ ] **Step 5:** commit：`bench: add scheduler sweeps and baseline report`
+- [x] **Step 1:** `run_sweeps.py`：W1–W4 × policies{5} × dram{1%,5%,25%,100%} × seed{1..5} 调 `msaflow-sim`，输出 `reports/scheduler/<workload>_<policy>_dram<f>_s<seed>.json`。
+- [x] **Step 2:** `report_scheduler.py` 聚合为 markdown 表格（physical reads、coalescing ratio、p95、starvation、overhead）。
+- [x] **Step 3:** Gate 判定（spec §20）：W1/W2 上 msaflow-v0 相对 generic LRU：physical reads 更少 ∧ coalescing ratio 更高 ∧ `starvation_count == 0` ∧ `scheduler_decision_ns_total / simulated_wall_ns < 1%`。输出 PASS/FAIL。
+- [x] **Step 4:** 若 FAIL：只调 policy 参数/逻辑，不扩功能（Rule 5）；FAIL 未解决前不进入 Phase 2。
+- [x] **Step 5:** commit：`bench: add scheduler sweeps and baseline report`
 
 ---
 

@@ -17,11 +17,15 @@ modifying HMMER3 search semantics.
 | Stage R — reference reconnaissance | done |
 | Phase 0 — workload characterization | done (gate: PASS, conditional) |
 | Phase 1 — scheduler simulator | done (gate: PASS) |
-| Phase 2 — local NVMe runtime | gated on a Linux + NVMe host |
+| Phase 2 — local NVMe runtime | done (2A portable core + 2B io_uring), on a Linux host |
 
-Phase 2 is blocked on environment, not on code readiness — the `StorageBackend`
-seam (`core/include/msaflow/io_backend.hpp`) and entry criteria are already defined in
-[`docs/phase2-entry-criteria.md`](docs/phase2-entry-criteria.md).
+Phase 2A added the portable runtime: FASTA → Block DB builder, `BufferPool`, a
+synchronous `pread` backend, an extended metrics JSON, and a cross-check harness
+that asserts the runtime reproduces the simulator's decisions. Phase 2B added a
+liburing-based `IoUringBackend` with `O_DIRECT` and a storage benchmark. See
+[`reports/phase2-storage.md`](reports/phase2-storage.md) and
+[`benchmark_runs/`](benchmark_runs). Real-trace calibration (P0.4) and the HMMER/AF3
+seams (Phases 3–4) remain open — no real AF3 database is available on the dev host.
 
 ## Why
 
@@ -45,21 +49,27 @@ real-database environment exists. See
 
 | Path | Purpose |
 | --- | --- |
-| `core/` | C++20 schedule/cache/IO-core (shared by simulator and future runtime) |
+| `core/` | C++20 schedule/cache/IO-core + `ReplayEngine` (shared by simulator and runtime) |
 | `simulator/` | Discrete-event simulator; builds `msaflow-sim` |
-| `tools/` | Python offline tooling: trace generation, analysis, sweeps |
-| `tests/` | GoogleTest unit suite + golden fixtures |
-| `docs/` | Architecture, reading notes, plans, entry criteria, toolchain |
+| `runtime/` | Local storage runtime; builds `msaflow-runtime` (sim / pread / io_uring) |
+| `storage/` | `StorageBackend` implementations: `sync/pread_backend`, `local_nvme/io_uring_backend` |
+| `database/` | Block DB format + Python builder (`database/builder`) |
+| `tools/` | Python offline tooling: traces, analysis, sweeps, synthetic data, benchmark |
+| `tests/` | GoogleTest unit suite, golden fixtures, cross-check integration test |
+| `benchmark_runs/` | Per-run metadata/results/report (spec Rule 4) |
+| `docs/` | Architecture, reading notes, plans, entry criteria, toolchain, known issues |
 | `reports/` | Phase reports and metrics JSON |
 | `third_party/` | Pinned reference checkouts — see `third_party/REFERENCES.md` |
 | `.agents/skills/` | Project-scoped coding-agent skills — see `docs/toolchain.md` |
 
 ## Build & test
 
-Requires CMake ≥3.20, a C++20 compiler, Python 3.11+.
+Requires CMake ≥3.20, a C++20 compiler, Python 3.11+. The io_uring backend is
+optional: build liburing under `third_party/liburing/_install` (see
+`third_party/REFERENCES.md`) and CMake enables it automatically.
 
 ```bash
-# build + unit tests (GoogleTest fetched via FetchContent; 47 tests)
+# build + tests (GoogleTest via FetchContent; unit + cross-check integration)
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j
 ctest --test-dir build --output-on-failure
@@ -72,12 +82,14 @@ ctest --test-dir build --output-on-failure
 # generate traces (w1..w4)
 python3 -m tools.trace_generator.generate --workload w1 --seed 7 --out workloads/w1.jsonl
 
-# analyze a trace
-python3 -m tools.trace_analyzer.analyze --trace workloads/w1.jsonl --out reports/workload/w1.json
+# build a Block Database and replay it through the runtime
+python3 tools/make_synthetic_blockdb.py --out /tmp/benchdb \
+  --total-bytes 268435456 --block-bytes 4194304 --seed 7
+./build/runtime/msaflow-runtime --trace workloads/w1.jsonl --db /tmp/benchdb \
+  --backend io_uring --direct --policy msaflow-v0 --dram-blocks 73 --io-depth 32
 
-# scheduler sweeps + report
-python3 tools/run_sweeps.py
-python3 tools/report_scheduler.py
+# Phase 2 storage benchmark
+python3 tools/run_phase2_benchmark.py --db /tmp/benchdb --concurrency 8,16,32,64
 ```
 
 ## Phases
